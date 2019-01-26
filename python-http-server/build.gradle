@@ -1,0 +1,21 @@
+
+plugins {
+  id 'com.palantir.docker' version '0.21.0'
+  id 'com.palantir.docker-run' version '0.21.0'
+}
+
+def version = '0.2'
+def registry = 'localhost:5000'
+def imageName = 'phttpserver'
+ext.imageTag = "${registry}/${imageName}:${version}"
+
+docker {
+    name imageTag
+}
+
+dockerRun {
+    name "phttpserver"
+    image imageTag
+    ports '8081:8081'
+    daemonize true
+}

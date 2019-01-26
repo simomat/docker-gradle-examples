@@ -1,0 +1,35 @@
+
+plugins {
+  id 'com.palantir.docker' version '0.21.0'
+  id 'com.palantir.docker-run' version '0.21.0'
+}
+
+def version = '18.4.0-xe'
+def registry = 'localhost:5000'
+def imageName = 'oracle18xe'
+def dbVolumeDir = '/tmp/oracle-db-volume'
+ext.imageTag = "${registry}/${imageName}:${version}"
+
+docker {
+    name imageTag
+    files 'checkDBStatus.sh', 'oracle-database-xe-18c-1.0-1.x86_64.rpm', 'oracle-xe-18c.conf', 'runOracle.sh', 'setPassword.sh'
+}
+
+dockerRun {
+    name imageName
+    image imageTag
+    ports '1521:1521', '5500:5500'
+    volumes "${dbVolumeDir}": '/opt/oracle/oradata'
+//            ,'/path/to/startup/scripts': '/opt/oracle/scripts/startup'
+//            ,'/path/to/setup/scripts':'/opt/oracle/scripts/setup'
+    env 'ORACLE_SID': 'XE', 'ORACLE_PWD': 'test123'
+//        ,'ORACLE_PDB': 'ORCLPDB1'
+//        ,'ORACLE_CHARACTERSET': 'AL32UTF8'
+    daemonize true
+}
+
+new File(dbVolumeDir).mkdirs()
+task createDbVolumeDir(type: Exec) {
+  commandLine 'chmod', '777', dbVolumeDir
+}
+tasks.getByName('dockerRun').dependsOn(createDbVolumeDir)

@@ -1,0 +1,19 @@
+
+
+plugins {
+  id 'com.palantir.docker-run' version '0.21.0'
+}
+
+
+def registryDir = '/tmp/registryDir'
+
+dockerRun {
+    name "registry"
+    image "registry:2"
+    ports '5000:5000'
+    volumes "${registryDir}": '/var/lib/registry'
+    daemonize true
+}
+
+
+new File(registryDir).mkdirs()
