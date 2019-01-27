@@ -4,7 +4,7 @@ plugins {
   id 'com.palantir.docker-run' version '0.21.0'
 }
 
-def version = '18.4.0-xe'
+def version = '18.4.0-1'
 def registry = 'localhost:5000'
 def imageName = 'oracle18xe'
 def dbVolumeDir = '/tmp/oracle-db-volume'
@@ -29,7 +29,7 @@ dockerRun {
 }
 
 new File(dbVolumeDir).mkdirs()
-task createDbVolumeDir(type: Exec) {
+task chmodDbVolumeDir(type: Exec) {
   commandLine 'chmod', '777', dbVolumeDir
 }
-tasks.getByName('dockerRun').dependsOn(createDbVolumeDir)
+tasks.getByName('dockerRun').dependsOn(chmodDbVolumeDir)
